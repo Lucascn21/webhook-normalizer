@@ -8,9 +8,7 @@ describe('WebhooksController', () => {
   let app: INestApplication;
 
   const makeRequest = (body: any) => {
-    return request(app.getHttpServer())
-      .post('/webhooks/normalize')
-      .send(body);
+    return request(app.getHttpServer()).post('/webhooks/normalize').send(body);
   };
 
   beforeEach(async () => {
@@ -101,14 +99,12 @@ Controller Tests Plan:
     // to ensure proper error reporting to API consumers.
 
     it('should return 200 with empty result when events array is empty', () => {
-      return makeRequest({ events: [] })
-        .expect(HttpStatus.OK)
-        .expect({
-          ordered_event_ids: [],
-          unique_count: 0,
-          first_timestamp: null,
-          last_timestamp: null,
-        });
+      return makeRequest({ events: [] }).expect(HttpStatus.OK).expect({
+        ordered_event_ids: [],
+        unique_count: 0,
+        first_timestamp: null,
+        last_timestamp: null,
+      });
     });
 
     it('should return 200 with normalized data for valid request', () => {

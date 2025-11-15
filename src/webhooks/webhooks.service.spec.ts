@@ -48,7 +48,9 @@ describe('WebhooksService', () => {
 
     // Note: Expected Output doesn't return source, so we can only verify deduplication occurred, not which source was kept
     it('should use lexicographic source as tiebreaker when timestamps equal', () => {
-      const result = service.normalize({ events: webhookFixtures.timestampTie });
+      const result = service.normalize({
+        events: webhookFixtures.timestampTie,
+      });
       expect(result.unique_count).toBe(1);
       expect(result.ordered_event_ids).toEqual(['evt_001']);
     });
