@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WebhooksController } from './webhooks.controller';
 import { WebhooksService } from './webhooks.service';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication, ValidationPipe, HttpStatus } from '@nestjs/common';
 import request from 'supertest';
 
 describe('WebhooksController', () => {
@@ -39,13 +39,13 @@ Controller Tests Plan:
       return request(app.getHttpServer())
         .post('/webhooks/normalize')
         .send({})
-        .expect(400);
+        .expect(HttpStatus.BAD_REQUEST);
     });
     it('should return 400 when events is not an array', () => {
       return request(app.getHttpServer())
         .post('/webhooks/normalize')
         .send({ events: 'not-an-array' })
-        .expect(400);
+        .expect(HttpStatus.BAD_REQUEST);
     });
     it('should return 400 when event_id is missing', () => {
       return request(app.getHttpServer())
@@ -58,7 +58,7 @@ Controller Tests Plan:
             },
           ],
         })
-        .expect(400);
+        .expect(HttpStatus.BAD_REQUEST);
     });
   });
 });
