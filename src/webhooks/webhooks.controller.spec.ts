@@ -41,5 +41,11 @@ Controller Tests Plan:
         .send({})
         .expect(400);
     });
+    it('should return 400 when events is not an array', () => {
+      return request(app.getHttpServer())
+        .post('/webhooks/normalize')
+        .send({ events: 'not-an-array' })
+        .expect(400);
+    });
   });
 });
