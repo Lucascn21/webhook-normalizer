@@ -83,7 +83,7 @@ export class WebhooksService {
       return a.event_id.localeCompare(b.event_id);
     });
   }
-  
+
   //Consideration: Although we could use a more rudimentary string comparison these timestamps (since the controller will only validate ISO 8601 strings) using Date objects ensures robustness and is a better practice.
   private getTimestamp(event: WebhookEventDto): number {
     return new Date(event.timestamp).getTime();

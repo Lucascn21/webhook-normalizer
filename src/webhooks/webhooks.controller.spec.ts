@@ -60,5 +60,57 @@ Controller Tests Plan:
         })
         .expect(HttpStatus.BAD_REQUEST);
     });
+    it('should return 400 when source is missing', () => {
+      return request(app.getHttpServer())
+        .post('/webhooks/normalize')
+        .send({
+          events: [
+            {
+              event_id: 'evt_001',
+              timestamp: '2025-11-15T10:30:00Z',
+            },
+          ],
+        })
+        .expect(HttpStatus.BAD_REQUEST);
+    });
+    it('should return 400 when timestamp is missing', () => {
+      return request(app.getHttpServer())
+        .post('/webhooks/normalize')
+        .send({
+          events: [
+            {
+              event_id: 'evt_001',
+              source: 'stripe',
+            },
+          ],
+        })
+        .expect(HttpStatus.BAD_REQUEST);
+    });
+    it('should return 400 when timestamp is not valid ISO8601', () => {
+      return request(app.getHttpServer())
+        .post('/webhooks/normalize')
+        .send({
+          events: [
+            {
+              event_id: 'evt_001',
+              source: 'stripe',
+              timestamp: 'invalid-date',
+            },
+          ],
+        })
+        .expect(HttpStatus.BAD_REQUEST);
+    });
+    it('should return 200 with empty result when events array is empty', () => {
+      return request(app.getHttpServer())
+        .post('/webhooks/normalize')
+        .send({ events: [] })
+        .expect(HttpStatus.OK)
+        .expect({
+          ordered_event_ids: [],
+          unique_count: 0,
+          first_timestamp: null,
+          last_timestamp: null,
+        });
+    });
   });
 });
