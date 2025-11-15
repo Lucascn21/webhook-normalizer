@@ -37,7 +37,6 @@ export class WebhooksService {
         eventMap.set(event.event_id, event);
       } else {
         // Duplicate found - keep the one with earliest timestamp
-        // If timestamps are equal, use lexicographic source as tiebreaker
         const comparison = this.compareEvents(event, existing);
         if (comparison === EventComparison.KEEP_NEW) {
           eventMap.set(event.event_id, event);
