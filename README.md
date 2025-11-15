@@ -164,7 +164,7 @@ Run: `npm test`
 
 **Idempotency Guard:**
 
-This feature was implemented as a proof-of-concept based on interview discussions about idempotency and request hashing in webhook systems.
+This feature was implemented as a proof-of-concept based on interview discussions about idempotency and hashing/encrypting.
 
 - Protects against duplicate webhook deliveries (common in webhook systems)
 - 60-second deduplication window using SHA-256 request body hash
