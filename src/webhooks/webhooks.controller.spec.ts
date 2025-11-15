@@ -112,5 +112,36 @@ Controller Tests Plan:
           last_timestamp: null,
         });
     });
+
+    it('should return 200 with normalized data for valid request', () => {
+      return request(app.getHttpServer())
+        .post('/webhooks/normalize')
+        .send({
+          events: [
+            {
+              event_id: 'evt_003',
+              source: 'stripe',
+              timestamp: '2025-11-15T10:35:00Z',
+            },
+            {
+              event_id: 'evt_001',
+              source: 'github',
+              timestamp: '2025-11-15T10:25:00Z',
+            },
+            {
+              event_id: 'evt_002',
+              source: 'shopify',
+              timestamp: '2025-11-15T10:35:00Z',
+            },
+          ],
+        })
+        .expect(HttpStatus.OK)
+        .expect({
+          ordered_event_ids: ['evt_001', 'evt_002', 'evt_003'],
+          unique_count: 3,
+          first_timestamp: '2025-11-15T10:25:00Z',
+          last_timestamp: '2025-11-15T10:35:00Z',
+        });
+    });
   });
 });
