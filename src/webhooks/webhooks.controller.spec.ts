@@ -47,5 +47,18 @@ Controller Tests Plan:
         .send({ events: 'not-an-array' })
         .expect(400);
     });
+    it('should return 400 when event_id is missing', () => {
+      return request(app.getHttpServer())
+        .post('/webhooks/normalize')
+        .send({
+          events: [
+            {
+              source: 'stripe',
+              timestamp: '2025-11-15T10:30:00Z',
+            },
+          ],
+        })
+        .expect(400);
+    });
   });
 });
