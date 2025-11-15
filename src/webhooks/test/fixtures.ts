@@ -31,9 +31,9 @@ export const webhookFixtures = {
   ],
 
   unsortedEvents: [
-    createEvent('evt_003', 'stripe', '2025-11-15T10:35:00Z'),
-    createEvent('evt_001', 'github', '2025-11-15T10:25:00Z'),
-    createEvent('evt_002', 'shopify', '2025-11-15T10:35:00Z'),
+    createEvent('evt_003', 'stripe', '2025-11-15T10:35:00Z'), // index 0
+    createEvent('evt_001', 'github', '2025-11-15T10:25:00Z'), // index 1 - EARLIEST
+    createEvent('evt_002', 'shopify', '2025-11-15T10:35:00Z'), // index 2 - same timestamp as evt_003
   ],
 
   allDuplicates: [

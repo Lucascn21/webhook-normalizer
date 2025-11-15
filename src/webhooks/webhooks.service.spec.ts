@@ -50,32 +50,29 @@ describe('WebhooksService', () => {
 
     it('should deduplicate by event_id keeping earliest timestamp', () => {
       const result = service.normalize(webhookFixtures.duplicateEvents);
-
       expect(result.unique_count).toBe(1);
       expect(result.ordered_event_ids).toEqual(['evt_001']);
       expect(result.first_timestamp).toBe('2025-11-15T10:25:00Z'); // earliest
       expect(result.last_timestamp).toBe('2025-11-15T10:25:00Z');
     });
 
+    // Note: Expected Output doesn't return source, so we can only verify deduplication occurred, not which source was kept
     it('should use lexicographic source as tiebreaker when timestamps equal', () => {
       const result = service.normalize(webhookFixtures.timestampTie);
-
       expect(result.unique_count).toBe(1);
       expect(result.ordered_event_ids).toEqual(['evt_001']);
-      // Should keep "github" because "g" < "s" lexicographically
     });
 
     it('should sort events by timestamp ascending, then by event_id ascending', () => {
-      const unsorted = webhookFixtures.unsortedEvents;
-      const result = service.normalize(unsorted);
+      const result = service.normalize(webhookFixtures.unsortedEvents);
 
-      expect(result.ordered_event_ids).toHaveLength(3);
-      expect(result.ordered_event_ids[0]).toBe(unsorted[2].event_id); // evt_1 (earliest)
-      expect(result.ordered_event_ids[1]).toBe(unsorted[0].event_id); // evt_2 (middle)
-      expect(result.ordered_event_ids[2]).toBe(unsorted[1].event_id); // evt_3 (latest)
-
-      expect(result.first_timestamp).toBe(unsorted[2].timestamp);
-      expect(result.last_timestamp).toBe(unsorted[1].timestamp);
+      expect(result.ordered_event_ids).toEqual([
+        'evt_001',
+        'evt_002',
+        'evt_003',
+      ]);
+      expect(result.first_timestamp).toBe('2025-11-15T10:25:00Z');
+      expect(result.last_timestamp).toBe('2025-11-15T10:35:00Z');
       expect(result.unique_count).toBe(3);
     });
   });

@@ -22,8 +22,8 @@ export class WebhooksService {
 
   private processEvents(events: WebhookEventDto[]): WebhookEventDto[] {
     const deduplicated = this.deduplicateEvents(events);
-    // TODO: sorting will be added later
-    return deduplicated;
+    const sorted = this.sortEvents(deduplicated);
+    return sorted;
   }
 
   private deduplicateEvents(events: WebhookEventDto[]): WebhookEventDto[] {
@@ -69,5 +69,19 @@ export class WebhooksService {
     if (sourceComparison < 0) return EventComparison.KEEP_NEW;
     if (sourceComparison > 0) return EventComparison.KEEP_EXISTING;
     return EventComparison.EQUIVALENT;
+  }
+
+  private sortEvents(events: WebhookEventDto[]): WebhookEventDto[] {
+    return events.sort((a, b) => {
+      const timeA = new Date(a.timestamp).getTime();
+      const timeB = new Date(b.timestamp).getTime();
+
+      if (timeA !== timeB) {
+        return timeA - timeB; // Ascending order
+      }
+
+      // If timestamps are equal, compare by event_id
+      return a.event_id.localeCompare(b.event_id);
+    });
   }
 }
