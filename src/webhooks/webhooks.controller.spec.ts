@@ -7,6 +7,12 @@ import request from 'supertest';
 describe('WebhooksController', () => {
   let app: INestApplication;
 
+  const makeRequest = (body: any) => {
+    return request(app.getHttpServer())
+      .post('/webhooks/normalize')
+      .send(body);
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [WebhooksController],
@@ -36,74 +42,66 @@ Controller Tests Plan:
 
   describe('POST /webhooks/normalize', () => {
     it('should return 400 when events array is missing', () => {
-      return request(app.getHttpServer())
-        .post('/webhooks/normalize')
-        .send({})
-        .expect(HttpStatus.BAD_REQUEST);
+      return makeRequest({}).expect(HttpStatus.BAD_REQUEST);
     });
+
     it('should return 400 when events is not an array', () => {
-      return request(app.getHttpServer())
-        .post('/webhooks/normalize')
-        .send({ events: 'not-an-array' })
-        .expect(HttpStatus.BAD_REQUEST);
+      return makeRequest({ events: 'not-an-array' }).expect(
+        HttpStatus.BAD_REQUEST,
+      );
     });
+
     it('should return 400 when event_id is missing', () => {
-      return request(app.getHttpServer())
-        .post('/webhooks/normalize')
-        .send({
-          events: [
-            {
-              source: 'stripe',
-              timestamp: '2025-11-15T10:30:00Z',
-            },
-          ],
-        })
-        .expect(HttpStatus.BAD_REQUEST);
+      return makeRequest({
+        events: [
+          {
+            source: 'stripe',
+            timestamp: '2025-11-15T10:30:00Z',
+          },
+        ],
+      }).expect(HttpStatus.BAD_REQUEST);
     });
+
     it('should return 400 when source is missing', () => {
-      return request(app.getHttpServer())
-        .post('/webhooks/normalize')
-        .send({
-          events: [
-            {
-              event_id: 'evt_001',
-              timestamp: '2025-11-15T10:30:00Z',
-            },
-          ],
-        })
-        .expect(HttpStatus.BAD_REQUEST);
+      return makeRequest({
+        events: [
+          {
+            event_id: 'evt_001',
+            timestamp: '2025-11-15T10:30:00Z',
+          },
+        ],
+      }).expect(HttpStatus.BAD_REQUEST);
     });
+
     it('should return 400 when timestamp is missing', () => {
-      return request(app.getHttpServer())
-        .post('/webhooks/normalize')
-        .send({
-          events: [
-            {
-              event_id: 'evt_001',
-              source: 'stripe',
-            },
-          ],
-        })
-        .expect(HttpStatus.BAD_REQUEST);
+      return makeRequest({
+        events: [
+          {
+            event_id: 'evt_001',
+            source: 'stripe',
+          },
+        ],
+      }).expect(HttpStatus.BAD_REQUEST);
     });
+
     it('should return 400 when timestamp is not valid ISO8601', () => {
-      return request(app.getHttpServer())
-        .post('/webhooks/normalize')
-        .send({
-          events: [
-            {
-              event_id: 'evt_001',
-              source: 'stripe',
-              timestamp: 'invalid-date',
-            },
-          ],
-        })
-        .expect(HttpStatus.BAD_REQUEST);
+      return makeRequest({
+        events: [
+          {
+            event_id: 'evt_001',
+            source: 'stripe',
+            timestamp: 'invalid-date',
+          },
+        ],
+      }).expect(HttpStatus.BAD_REQUEST);
     });
+
+    // Note: Validation of specific error messages was not required in the spec,
+    // but in a production environment we would validate error message content
+    // to ensure proper error reporting to API consumers.
+
     it('should return 200 with empty result when events array is empty', () => {
-      return request(app.getHttpServer())
-        .post('/webhooks/normalize')
-        .send({ events: [] })
+      return makeRequest({ events: [] })
         .expect(HttpStatus.OK)
         .expect({
           ordered_event_ids: [],
@@ -114,27 +112,25 @@ Controller Tests Plan:
     });
 
     it('should return 200 with normalized data for valid request', () => {
-      return request(app.getHttpServer())
-        .post('/webhooks/normalize')
-        .send({
-          events: [
-            {
-              event_id: 'evt_003',
-              source: 'stripe',
-              timestamp: '2025-11-15T10:35:00Z',
-            },
-            {
-              event_id: 'evt_001',
-              source: 'github',
-              timestamp: '2025-11-15T10:25:00Z',
-            },
-            {
-              event_id: 'evt_002',
-              source: 'shopify',
-              timestamp: '2025-11-15T10:35:00Z',
-            },
-          ],
-        })
+      return makeRequest({
+        events: [
+          {
+            event_id: 'evt_003',
+            source: 'stripe',
+            timestamp: '2025-11-15T10:35:00Z',
+          },
+          {
+            event_id: 'evt_001',
+            source: 'github',
+            timestamp: '2025-11-15T10:25:00Z',
+          },
+          {
+            event_id: 'evt_002',
+            source: 'shopify',
+            timestamp: '2025-11-15T10:35:00Z',
+          },
+        ],
+      })
         .expect(HttpStatus.OK)
         .expect({
           ordered_event_ids: ['evt_001', 'evt_002', 'evt_003'],

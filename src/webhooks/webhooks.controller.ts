@@ -10,6 +10,6 @@ export class WebhooksController {
   @Post('normalize')
   @HttpCode(HttpStatus.OK)
   normalize(@Body() request: NormalizeRequestDto): NormalizeResponseDto {
-    return this.webhooksService.normalize(request.events);
+    return this.webhooksService.normalize(request);
   }
 }

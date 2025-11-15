@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { WebhookEventDto } from './dto/webhook-event.dto';
 import { NormalizeResponseDto } from './dto/normalize-response.dto';
+import { NormalizeRequestDto } from './dto/normalize-request.dto';
 
-//Consideration: Normally i would use an enum file but for legiblity in this context i am keeping it here.
+//Consideration: Normally I would use an enum file but for legibility in this context I am keeping it here.
 enum EventComparison {
   KEEP_NEW = -1,
   EQUIVALENT = 0,
@@ -11,12 +12,12 @@ enum EventComparison {
 
 @Injectable()
 export class WebhooksService {
-  normalize(events: WebhookEventDto[]): NormalizeResponseDto {
-    if (events.length === 0) {
+  normalize(request: NormalizeRequestDto): NormalizeResponseDto {
+    if (request.events.length === 0) {
       return NormalizeResponseDto.empty();
     }
 
-    const processedEvents = this.processEvents(events);
+    const processedEvents = this.processEvents(request.events);
     return NormalizeResponseDto.fromEvents(processedEvents);
   }
 

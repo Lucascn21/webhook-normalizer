@@ -15,7 +15,7 @@ describe('WebhooksService', () => {
   describe('normalize', () => {
     //Presumption: An empty array of events should be expected to return an empty normalization result.
     it('should handle empty array', () => {
-      const result = service.normalize(webhookFixtures.emptyArray);
+      const result = service.normalize({ events: webhookFixtures.emptyArray });
 
       expect(result).toEqual({
         ordered_event_ids: [],
@@ -26,7 +26,7 @@ describe('WebhooksService', () => {
     });
 
     it('should handle single event', () => {
-      const result = service.normalize(webhookFixtures.singleEvent);
+      const result = service.normalize({ events: webhookFixtures.singleEvent });
 
       expect(result).toEqual({
         ordered_event_ids: ['evt_001'],
@@ -37,7 +37,9 @@ describe('WebhooksService', () => {
     });
 
     it('should deduplicate by event_id keeping earliest timestamp', () => {
-      const result = service.normalize(webhookFixtures.duplicateEvents);
+      const result = service.normalize({
+        events: webhookFixtures.duplicateEvents,
+      });
       expect(result.unique_count).toBe(1);
       expect(result.ordered_event_ids).toEqual(['evt_001']);
       expect(result.first_timestamp).toBe('2025-11-15T10:25:00Z'); // earliest
@@ -46,13 +48,15 @@ describe('WebhooksService', () => {
 
     // Note: Expected Output doesn't return source, so we can only verify deduplication occurred, not which source was kept
     it('should use lexicographic source as tiebreaker when timestamps equal', () => {
-      const result = service.normalize(webhookFixtures.timestampTie);
+      const result = service.normalize({ events: webhookFixtures.timestampTie });
       expect(result.unique_count).toBe(1);
       expect(result.ordered_event_ids).toEqual(['evt_001']);
     });
 
     it('should sort events by timestamp ascending, then by event_id ascending', () => {
-      const result = service.normalize(webhookFixtures.unsortedEvents);
+      const result = service.normalize({
+        events: webhookFixtures.unsortedEvents,
+      });
 
       expect(result.ordered_event_ids).toEqual([
         'evt_001',
@@ -65,7 +69,9 @@ describe('WebhooksService', () => {
     });
 
     it('should handle all duplicates', () => {
-      const result = service.normalize(webhookFixtures.allDuplicates);
+      const result = service.normalize({
+        events: webhookFixtures.allDuplicates,
+      });
 
       expect(result.unique_count).toBe(1);
       expect(result.ordered_event_ids).toEqual(['evt_001']);
