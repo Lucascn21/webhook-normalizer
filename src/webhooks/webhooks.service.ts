@@ -47,13 +47,12 @@ export class WebhooksService {
     return Array.from(eventMap.values());
   }
 
-  //Consideration: Although we could use string comparison for ISO 8601 timestamps, since the controller will only validate ISO 8601 strings, using Date objects ensures robustness and is a better practice.
   private compareEvents(
     newEvent: WebhookEventDto,
     existingEvent: WebhookEventDto,
   ): EventComparison {
-    const newEventTime = new Date(newEvent.timestamp).getTime();
-    const existingEventTime = new Date(existingEvent.timestamp).getTime();
+    const newEventTime = this.getTimestamp(newEvent);
+    const existingEventTime = this.getTimestamp(existingEvent);
 
     if (newEventTime < existingEventTime) {
       return EventComparison.KEEP_NEW;
@@ -72,9 +71,9 @@ export class WebhooksService {
   }
 
   private sortEvents(events: WebhookEventDto[]): WebhookEventDto[] {
-    return events.sort((a, b) => {
-      const timeA = new Date(a.timestamp).getTime();
-      const timeB = new Date(b.timestamp).getTime();
+    return [...events].sort((a, b) => {
+      const timeA = this.getTimestamp(a);
+      const timeB = this.getTimestamp(b);
 
       if (timeA !== timeB) {
         return timeA - timeB; // Ascending order
@@ -83,5 +82,10 @@ export class WebhooksService {
       // If timestamps are equal, compare by event_id
       return a.event_id.localeCompare(b.event_id);
     });
+  }
+  
+  //Consideration: Although we could use a more rudimentary string comparison these timestamps (since the controller will only validate ISO 8601 strings) using Date objects ensures robustness and is a better practice.
+  private getTimestamp(event: WebhookEventDto): number {
+    return new Date(event.timestamp).getTime();
   }
 }

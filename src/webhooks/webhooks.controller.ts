@@ -8,7 +8,7 @@ export class WebhooksController {
   constructor(private readonly webhooksService: WebhooksService) {}
 
   @Post('normalize')
-  normalize(@Body() requestBody: NormalizeRequestDto): NormalizeResponseDto {
-    return this.webhooksService.normalize(requestBody.events);
+  normalize(@Body() request: NormalizeRequestDto): NormalizeResponseDto {
+    return this.webhooksService.normalize(request.events);
   }
 }

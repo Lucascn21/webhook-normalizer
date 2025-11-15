@@ -75,5 +75,14 @@ describe('WebhooksService', () => {
       expect(result.last_timestamp).toBe('2025-11-15T10:35:00Z');
       expect(result.unique_count).toBe(3);
     });
+
+    it('should handle all duplicates', () => {
+      const result = service.normalize(webhookFixtures.allDuplicates);
+
+      expect(result.unique_count).toBe(1);
+      expect(result.ordered_event_ids).toEqual(['evt_001']);
+      expect(result.first_timestamp).toBe('2025-11-15T10:30:00Z');
+      expect(result.last_timestamp).toBe('2025-11-15T10:30:00Z');
+    });
   });
 });
