@@ -110,6 +110,7 @@ npm run test:cov
 src/
   webhooks/
     dto/                    # Data Transfer Objects with validation
+    guards/                 # Request guards (duplicate detection)
     test/                   # Test fixtures
     webhooks.controller.ts  # HTTP layer (validation, routing)
     webhooks.service.ts     # Business logic (deduplication, sorting)
@@ -126,6 +127,14 @@ src/
 - Each event has required fields: `event_id`, `source`, `timestamp`
 - `timestamp` is valid ISO 8601 format
 - Returns `400 Bad Request` for invalid input
+
+**NestJS Pipes & Guards:**
+
+- **ValidationPipe:** Automatic DTO validation using `class-validator` decorators
+- **DuplicateRequestGuard:** Detects and rejects duplicate requests within a 60-second window (idempotency protection)
+  - Returns `409 Conflict` for duplicate requests
+  - Uses SHA-256 hash of request body for detection
+  - In-memory cache with TTL cleanup (production would use Redis/distributed cache)
 
 ---
 
@@ -148,6 +157,28 @@ src/
 - Full normalization flow
 
 Run: `npm test`
+
+---
+
+## Bonus Features
+
+**Idempotency Guard:**
+
+This feature was implemented as a proof-of-concept based on interview discussions about idempotency and request hashing in webhook systems.
+
+- Protects against duplicate webhook deliveries (common in webhook systems)
+- 60-second deduplication window using SHA-256 request body hash
+- Returns `409 Conflict` for duplicates within TTL
+
+**Note on Production Readiness:**
+
+This is a simplified implementation to demonstrate the concept. In a production environment:
+
+- Exception messages would be centralized in constants/i18n files (not hardcoded strings)
+- Error handling would use global exception filters for consistent API responses
+- Cache would use Redis or similar distributed storage instead of in-memory Map
+- Configuration (TTL, cache strategy) would be externalized via environment variables
+- Proper logging and monitoring would be integrated
 
 ---
 
