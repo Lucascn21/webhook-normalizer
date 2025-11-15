@@ -47,7 +47,7 @@ describe('WebhooksService', () => {
         last_timestamp: '2025-11-15T10:30:00Z',
       });
     });
-    
+
     it('should deduplicate by event_id keeping earliest timestamp', () => {
       const result = service.normalize(webhookFixtures.duplicateEvents);
 
@@ -63,6 +63,20 @@ describe('WebhooksService', () => {
       expect(result.unique_count).toBe(1);
       expect(result.ordered_event_ids).toEqual(['evt_001']);
       // Should keep "github" because "g" < "s" lexicographically
+    });
+
+    it('should sort events by timestamp ascending, then by event_id ascending', () => {
+      const unsorted = webhookFixtures.unsortedEvents;
+      const result = service.normalize(unsorted);
+
+      expect(result.ordered_event_ids).toHaveLength(3);
+      expect(result.ordered_event_ids[0]).toBe(unsorted[2].event_id); // evt_1 (earliest)
+      expect(result.ordered_event_ids[1]).toBe(unsorted[0].event_id); // evt_2 (middle)
+      expect(result.ordered_event_ids[2]).toBe(unsorted[1].event_id); // evt_3 (latest)
+
+      expect(result.first_timestamp).toBe(unsorted[2].timestamp);
+      expect(result.last_timestamp).toBe(unsorted[1].timestamp);
+      expect(result.unique_count).toBe(3);
     });
   });
 });
