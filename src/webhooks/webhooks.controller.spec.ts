@@ -1,7 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WebhooksController } from './webhooks.controller';
 import { WebhooksService } from './webhooks.service';
-import { INestApplication, ValidationPipe, HttpStatus } from '@nestjs/common';
+import {
+  INestApplication,
+  ValidationPipe,
+  HttpStatus,
+  BadRequestException,
+} from '@nestjs/common';
+import { ValidationError } from 'class-validator';
 import request from 'supertest';
 
 describe('WebhooksController', () => {
@@ -21,6 +27,31 @@ describe('WebhooksController', () => {
     app.useGlobalPipes(
       new ValidationPipe({
         transform: true, // Required for @Type() decorator in DTOs
+        exceptionFactory: (errors: ValidationError[]) => {
+          // Recursively collect all error messages
+          const collectMessages = (errors: ValidationError[]): string[] => {
+            return errors.flatMap((error) => {
+              const messages: string[] = [];
+
+              if (error.constraints) {
+                messages.push(
+                  ...Object.values(error.constraints).map((msg) =>
+                    msg.replace(/events\.\d+\./, 'event.'),
+                  ),
+                );
+              }
+
+              if (error.children && error.children.length > 0) {
+                messages.push(...collectMessages(error.children));
+              }
+
+              return messages;
+            });
+          };
+
+          const messages = collectMessages(errors);
+          return new BadRequestException(messages);
+        },
       }),
     );
     await app.init();
