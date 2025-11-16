@@ -63,8 +63,10 @@ export class WebhooksService {
     }
 
     // Timestamps are equal - use lexicographic source as tiebreaker
+    // Note: Using 'en-US' locale for deterministic sorting across different system environments
     const sourceComparison = newEvent.source.localeCompare(
       existingEvent.source,
+      'en-US',
     );
     if (sourceComparison < 0) return EventComparison.KEEP_NEW;
     if (sourceComparison > 0) return EventComparison.KEEP_EXISTING;
@@ -81,7 +83,8 @@ export class WebhooksService {
       }
 
       // If timestamps are equal, compare by event_id
-      return a.event_id.localeCompare(b.event_id);
+      // Note: Using 'en-US' locale for deterministic sorting across different system environments
+      return a.event_id.localeCompare(b.event_id, 'en-US');
     });
   }
 
