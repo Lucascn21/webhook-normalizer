@@ -55,6 +55,14 @@ describe('WebhooksService', () => {
       expect(result.ordered_event_ids).toEqual(['evt_001']);
     });
 
+    it('should select first alphabetical source among multiple duplicates with same timestamp', () => {
+      const result = service.normalize({
+        events: webhookFixtures.multipleSources,
+      });
+      expect(result.unique_count).toBe(1);
+      expect(result.ordered_event_ids).toEqual(['evt_001']);
+    });
+
     it('should sort events by timestamp ascending, then by event_id ascending', () => {
       const result = service.normalize({
         events: webhookFixtures.unsortedEvents,

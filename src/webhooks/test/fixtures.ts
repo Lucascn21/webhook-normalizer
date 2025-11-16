@@ -30,6 +30,12 @@ export const webhookFixtures = {
     createEvent('evt_001', 'github', '2025-11-15T10:30:00Z'), // "g" < "s" lexicographically
   ],
 
+  multipleSources: [
+    createEvent('evt_001', 'zebra', '2025-11-15T10:30:00Z'),
+    createEvent('evt_001', 'apple', '2025-11-15T10:30:00Z'), // Should be kept - first alphabetically
+    createEvent('evt_001', 'microsoft', '2025-11-15T10:30:00Z'),
+  ],
+
   unsortedEvents: [
     createEvent('evt_003', 'stripe', '2025-11-15T10:35:00Z'), // index 0
     createEvent('evt_001', 'github', '2025-11-15T10:25:00Z'), // index 1 - EARLIEST
