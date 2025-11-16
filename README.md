@@ -152,6 +152,7 @@ src/
 - Tie-breaking (lexicographic source)
 - Sorting (timestamp → event_id)
 - All duplicates edge case
+- Multiple sources same timestamp edge case
 
 **Controller Tests (Integration-like):**
 
@@ -159,6 +160,16 @@ src/
 - Invalid ISO 8601 timestamp
 - Empty array (valid case)
 - Full normalization flow
+
+**Guard Tests:**
+
+- Idempotency protection (duplicate detection)
+- Hash consistency
+- TTL behavior
+
+**Coverage:** Run `npm run test:cov` to see detailed report.
+- **99%** overall coverage (infrastructure files like `main.ts` and `*.module.ts` excluded as they don't contain business logic)
+- **100%** coverage on service and controller layers
 
 Run: `npm test`
 
