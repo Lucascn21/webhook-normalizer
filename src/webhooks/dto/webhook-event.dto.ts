@@ -1,4 +1,4 @@
-import { IsString, IsISO8601, IsOptional } from 'class-validator';
+import { IsString, IsISO8601, IsOptional, IsObject } from 'class-validator';
 
 export class WebhookEventDto {
   @IsString()
@@ -10,6 +10,9 @@ export class WebhookEventDto {
   @IsISO8601()
   timestamp: string;
 
+  // Presumption: Although payload structure is not specified in requirements,
+  // we validate it's at least an object if present to ensure data integrity.
   @IsOptional()
-  payload?: any;
+  @IsObject()
+  payload?: Record<string, any>;
 }
