@@ -31,7 +31,9 @@ describe('DuplicateRequestGuard', () => {
 
     expect(() => guard.canActivate(context2)).toThrow(ConflictException);
     expect(() => guard.canActivate(context2)).toThrow(
-      'Duplicate request detected',
+      expect.objectContaining({
+        message: expect.stringContaining('Duplicate request detected'),
+      }),
     );
   });
 
