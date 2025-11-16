@@ -18,25 +18,17 @@ describe('WebhooksController', () => {
     }).compile();
 
     app = module.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true, // Required for @Type() decorator in DTOs
+      }),
+    );
     await app.init();
   });
 
   afterEach(async () => {
     await app.close();
   });
-
-  /*
-Controller Tests Plan:
-- should return 400 when events array is missing
-- should return 400 when events is not an array
-- should return 400 when event_id is missing
-- should return 400 when source is missing
-- should return 400 when timestamp is missing
-- should return 400 when timestamp is not valid ISO8601
-- should return 200 with empty result when events array is empty
-- should return 200 with normalized data for valid request
-*/
 
   describe('POST /webhooks/normalize', () => {
     it('should return 400 when events array is missing', () => {
