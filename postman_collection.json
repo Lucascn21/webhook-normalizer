@@ -1,0 +1,543 @@
+{
+  "info": {
+    "name": "Webhook Normalizer API",
+    "description": "Complete test collection for Webhook Normalizer challenge - includes happy path and all edge cases",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Happy Path",
+      "item": [
+        {
+          "name": "Normalize Mixed Events (Happy Path)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"event_id\": \"evt_003\",\n      \"source\": \"stripe\",\n      \"timestamp\": \"2025-11-15T10:35:00Z\"\n    },\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"github\",\n      \"timestamp\": \"2025-11-15T10:25:00Z\"\n    },\n    {\n      \"event_id\": \"evt_002\",\n      \"source\": \"shopify\",\n      \"timestamp\": \"2025-11-15T10:35:00Z\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Single Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"stripe\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Empty Events Array",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": []\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Deduplication Cases",
+      "item": [
+        {
+          "name": "Duplicate Events - Keep Earliest Timestamp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"stripe\",\n      \"timestamp\": \"2025-11-15T10:35:00Z\"\n    },\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"github\",\n      \"timestamp\": \"2025-11-15T10:25:00Z\"\n    },\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"shopify\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Timestamp Tie - Lexicographic Source",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"stripe\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\"\n    },\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"github\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Multiple Sources Same Timestamp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"zebra\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\"\n    },\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"apple\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\"\n    },\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"microsoft\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "All Duplicates Same Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"stripe\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\"\n    },\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"stripe\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\"\n    },\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"stripe\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Sorting Cases",
+      "item": [
+        {
+          "name": "Unsorted Events - Multiple Criteria",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"event_id\": \"evt_003\",\n      \"source\": \"stripe\",\n      \"timestamp\": \"2025-11-15T10:35:00Z\"\n    },\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"github\",\n      \"timestamp\": \"2025-11-15T10:25:00Z\"\n    },\n    {\n      \"event_id\": \"evt_002\",\n      \"source\": \"shopify\",\n      \"timestamp\": \"2025-11-15T10:35:00Z\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Same Timestamp - Sort by Event ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"event_id\": \"evt_005\",\n      \"source\": \"stripe\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\"\n    },\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"github\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\"\n    },\n    {\n      \"event_id\": \"evt_003\",\n      \"source\": \"shopify\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Validation Errors (400)",
+      "item": [
+        {
+          "name": "Missing Events Field",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Events Not an Array",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": \"not-an-array\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Missing event_id",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"source\": \"stripe\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Missing source",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"event_id\": \"evt_001\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Missing timestamp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"stripe\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid ISO8601 Timestamp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"stripe\",\n      \"timestamp\": \"invalid-date-format\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid Payload Type (Not Object)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"stripe\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\",\n      \"payload\": \"should-be-object-not-string\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Bonus - Idempotency Guard (409)",
+      "item": [
+        {
+          "name": "First Request (Should Pass)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"event_id\": \"idempotency_test_001\",\n      \"source\": \"test\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Duplicate Request (Should Return 409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"event_id\": \"idempotency_test_001\",\n      \"source\": \"test\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Optional Payload Field",
+      "item": [
+        {
+          "name": "Event With Valid Payload Object",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"stripe\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\",\n      \"payload\": {\n        \"amount\": 1000,\n        \"currency\": \"USD\",\n        \"customer_id\": \"cust_123\"\n      }\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Event With Empty Payload Object",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"stripe\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\",\n      \"payload\": {}\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Event Without Payload (Optional)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"event_id\": \"evt_001\",\n      \"source\": \"stripe\",\n      \"timestamp\": \"2025-11-15T10:30:00Z\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/webhooks/normalize",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["webhooks", "normalize"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

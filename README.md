@@ -24,6 +24,8 @@ npm run test:cov
 
 **Endpoint:** `POST http://localhost:3000/webhooks/normalize`
 
+**Manual Testing:** Import `postman_collection.json` into Postman for a complete test suite with all edge cases.
+
 ---
 
 ## Example
@@ -179,6 +181,32 @@ This is a simplified implementation to demonstrate the concept. In a production 
 - Cache would use Redis or similar distributed storage instead of in-memory Map
 - Configuration (TTL, cache strategy) would be externalized via environment variables
 - Proper logging and monitoring would be integrated
+
+---
+
+## Implementation Notes
+
+**Code Organization:**
+
+- **Inline Enum:** The `EventComparison` enum is kept in `webhooks.service.ts` for legibility in this challenge context. In a larger codebase, it would be extracted to a shared enums file.
+
+**Test Coverage Decisions:**
+
+- **Error Message Validation:** Integration-like tests verify HTTP status codes (400, 409) but do not assert specific error message content. This was not required in the spec, but production tests would validate error messages to ensure proper API consumer communication.
+
+**API Response Format:**
+
+- **Source Field Omission:** The normalized response does not include the `source` field (only `event_id`). This means tests can verify that deduplication occurred, but cannot programmatically confirm which source was selected during tie-breaks. The business logic correctly implements lexicographic comparison as specified.
+
+**ValidationPipe Configuration:**
+
+- The `ValidationPipe` is configured with `transform: true`, which is required for the `@Type()` decorator to work in nested DTOs. This ensures request payloads are transformed into proper DTO class instances.
+- A custom `exceptionFactory` is implemented to format validation error messages in a user-friendly way. Since no specific error format was required in the spec, a basic implementation was chosen that:
+  - Recursively collects all validation errors (including nested DTOs)
+  - Replaces technical paths like `events.0.field` with more readable `event.field`
+  - Returns a clean array of error messages
+  - Note: The implementation does not differentiate between "missing field" vs "wrong type" errors (both return the same message). This distinction could be added but was considered out of scope for this challenge.
+- Other common production options like `whitelist: true` and `forbidNonWhitelisted: true` were omitted for simplicity, but would typically be configured based on security requirements.
 
 ---
 
