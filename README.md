@@ -92,14 +92,16 @@ npm run test:cov
 ## Key Assumptions
 
 - **Empty array handling:** Treated as valid input, returns empty normalized response (this is a normalizer, not a validator also the requirements state that we can have null timestamps which led me to believe that an empty array is a valid input as in we wouldnt have to return an error for it)
-- **Timestamp format:** ISO 8601 validated at the controller layer via `ValidationPipe`.
 - **Date parsing:** Using `Date` objects for robustness over string comparison (despite ISO 8601 being lexicographically sortable, and the controller layer already ensuring the incoming data type)
 
 ---
 
 ## Technical Decisions
 
-- **TDD approach:** Unit tests (service) + integration tests (controller) for reliable, production-ready code
+- **TDD approach:** Followed Red-Green-Refactor cycles throughout development, implementing tests before code for each feature
+- **Test architecture:** Two-layer testing strategy:
+  - Unit tests (service layer) - Business logic in isolation
+  - Integration tests (controller layer) - HTTP endpoints with validation
 - **NestJS framework:** TypeScript, dependency injection, built-in validation
 - **Testing tools:** Jest (unit), Supertest (HTTP integration)
 - **Git workflow:** Direct commits to `main` for simplicity; in production would follow GitFlow
